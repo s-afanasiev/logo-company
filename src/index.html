@@ -1,0 +1,60 @@
+<html>
+    <body>
+    <div style="position:absolute; top:300px;left:500px;">
+    <input type="text" id="name" name="name" required minlength="400" maxlength="500" size="100" />
+    <button onClick="buttonClick()">go</button>
+    <img id="image"/>
+    </div>
+    <script>
+        function buttonClick() {
+            const input = document.getElementById("name");
+            let uri = input.value;
+            const requestStr = "http://localhost:3000/logo?uri="+uri;
+            console.log("sending: "+requestStr);
+            fetchingPng(requestStr);
+            
+        }
+        async function fetchingPng(requestStr) {
+            const dataUri = await urlContentToDataUri(requestStr);
+            console.log("dataUri=", dataUri);
+            console.log("typeof dataUri=", typeof dataUri);
+            let index = dataUri.lastIndexOf("base64,");
+            console.log("index=", index);
+            const trimmed = dataUri.slice(index);
+            console.log("trimmed=", trimmed);
+            const changed = "data:image/png;"+trimmed;
+            console.log("changed=", changed);
+
+            // const response = await fetch(requestStr);
+            // console.log("response=", response);
+            // const myBlob = await response.blob();
+            // console.log("typeof myBlob=", typeof myBlob);
+
+            const image = document.getElementById("image");
+            image.src = changed;
+            //image.src = dataUri;
+
+            // var urlCreator = window.URL || window.webkitURL;
+            // var imageUrl = urlCreator.createObjectURL(myBlob);
+            // document.querySelector("#image").src = imageUrl;
+
+            // let blb = new Blob([ response.body ], {type: 'application/png'})
+            // let blb = new Blob([ myBlob ], {type: 'application/png'})
+            // console.log("blb=", blb);
+            // let link = window.URL.createObjectURL(blb);
+            // window.open(link);
+        }
+
+        function urlContentToDataUri(url){
+            return  fetch(url)
+                .then( response => response.blob() )
+                .then( blob => new Promise( callback =>{
+                    let reader = new FileReader() ;
+                    reader.onload = function(){ callback(this.result) } ;
+                    reader.readAsDataURL(blob) ;
+                }) ) ;
+        }
+    </script>
+
+    </body>
+</html>

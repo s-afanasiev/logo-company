@@ -4,14 +4,19 @@ import { readFile } from 'fs';
 
 @Injectable()
 export class SvgToPngService {
+    _wasm: any;
     constructor() {
         const wasmPath = './node_modules/svg2png-wasm/svg2png_wasm_bg.wasm';
         readFile(wasmPath, (err, res)=>{
+          this._wasm = res;
+          console.log("wasm=", res);
           initialize(res);
         });
       }
     
     async run() {
+      //await initialize(this._wasm);
+      console.log("SvgToPngService.run");
         // await initialize(
         //   readFileSync('./node_modules/svg2png-wasm/svg2png_wasm_bg.wasm'),
         // );
