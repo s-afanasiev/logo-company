@@ -14,35 +14,44 @@
             fetchingPng(requestStr);
             
         }
+        /** 
+         * @param requestStr @type {String} e.g. http://localhost:3000/logo?uri="http..."
+         * */
         async function fetchingPng(requestStr) {
-            const dataUri = await urlContentToDataUri(requestStr);
-            console.log("dataUri=", dataUri);
-            console.log("typeof dataUri=", typeof dataUri);
-            let index = dataUri.lastIndexOf("base64,");
-            console.log("index=", index);
-            const trimmed = dataUri.slice(index);
-            console.log("trimmed=", trimmed);
-            const changed = "data:image/png;"+trimmed;
-            console.log("changed=", changed);
+            drawBase64Png(requestStr);
+            // BufferAsBlobPng(requestStr);
+            // urlContentToDataUri(requestStr);
+        }
 
-            // const response = await fetch(requestStr);
-            // console.log("response=", response);
-            // const myBlob = await response.blob();
-            // console.log("typeof myBlob=", typeof myBlob);
+        function BufferAsBlobPng(url) {
+            return  fetch(url)
+                .then( response => {
+                    console.log("response.body=", response.body);
+                    // let blb = new Blob([ response.body ], {type: 'application/png'})
+                    // let blb = new Blob([ myBlob ], {type: 'application/png'})
+                    // console.log("blb=", blb)
+                    // var urlCreator = window.URL || window.webkitURL;
+                    // var imageUrl = urlCreator.createObjectURL(blb);
+                    // window.open(imageUrl);
+                });
+        }
 
-            const image = document.getElementById("image");
-            image.src = changed;
-            //image.src = dataUri;
-
-            // var urlCreator = window.URL || window.webkitURL;
-            // var imageUrl = urlCreator.createObjectURL(myBlob);
-            // document.querySelector("#image").src = imageUrl;
-
-            // let blb = new Blob([ response.body ], {type: 'application/png'})
-            // let blb = new Blob([ myBlob ], {type: 'application/png'})
-            // console.log("blb=", blb);
-            // let link = window.URL.createObjectURL(blb);
-            // window.open(link);
+        function drawBase64Png(url) {
+            document.getElementById("image").src = "";
+            return  fetch(url)
+                .then( response => {
+                    console.log("response=", response);
+                    console.log("content-type=", response.headers.get("content-type"));
+                    return response.text();
+                    //return response.blob();
+                }).then( body => {
+                    let imgSrc = body;
+                    if(!body.startsWith("data:image")){
+                        imgSrc = "data:image/png;base64,"+body;
+                    }
+                    console.log("imgSrc:", imgSrc);
+                    document.getElementById("image").src = imgSrc;
+                })
         }
 
         function urlContentToDataUri(url){
